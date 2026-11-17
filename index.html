@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#fff7f9">
+    <title>Thiệp sinh nhật</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink: #f28eaa;
+            --deep-pink: #c94d78;
+            --soft-pink: #fde3eb;
+            --cream-white: #fffaf7;
+            --ink: #573944;
+            --muted: #8d6c77;
+            --shadow: 0 18px 48px rgba(183, 91, 124, 0.15);
+            font-family: "Be Vietnam Pro", sans-serif;
+            color: var(--ink);
+            background: var(--cream-white);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-width: 320px;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            background:
+                radial-gradient(ellipse at 12% 18%, rgba(253, 227, 235, 0.8), transparent 28rem),
+                radial-gradient(ellipse at 90% 86%, rgba(255, 232, 223, 0.8), transparent 30rem),
+                var(--cream-white);
+        }
+
+        button {
+            font: inherit;
+        }
+
+        button:focus-visible {
+            outline: 3px solid var(--deep-pink);
+            outline-offset: 4px;
+        }
+
+        .hidden,
+        [hidden] {
+            display: none !important;
+        }
+
+        .cover-screen {
+            position: fixed;
+            z-index: 5;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            padding: 28px;
+            background:
+                radial-gradient(ellipse at 50% 40%, #fff 0, rgba(255, 250, 247, 0.72) 42%, transparent 72%),
+                var(--soft-pink);
+            opacity: 1;
+            transition: opacity 600ms ease, transform 600ms ease;
+        }
+
+        .cover-screen::before,
+        .cover-screen::after {
+            position: absolute;
+            color: rgba(201, 77, 120, 0.2);
+            content: "✿";
+            font-size: clamp(5rem, 14vw, 11rem);
+            pointer-events: none;
+        }
+
+        .cover-screen::before {
+            top: 5%;
+            left: 7%;
+            transform: rotate(-18deg);
+        }
+
+        .cover-screen::after {
+            right: 7%;
+            bottom: 4%;
+            transform: rotate(17deg);
+        }
+
+        .cover-screen.is-leaving {
+            transform: scale(1.035);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .cover-button {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            width: min(100%, 520px);
+            min-height: 440px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            border-radius: 40px;
+            padding: 32px 26px;
+            color: var(--ink);
+            background: rgba(255, 250, 247, 0.76);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 180ms ease, box-shadow 180ms ease;
+        }
+
+        .cover-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 24px 58px rgba(183, 91, 124, 0.2);
+        }
+
+        .cover-button:active {
+            transform: scale(0.98);
+        }
+
+        .gift-art {
+            position: relative;
+            width: 144px;
+            height: 126px;
+            margin: 8px 0 28px;
+            animation: gift-bob 2.8s ease-in-out infinite;
+        }
+
+        .gift-box {
+            position: absolute;
+            right: 7px;
+            bottom: 0;
+            left: 7px;
+            height: 91px;
+            border: 4px solid #e983a2;
+            border-radius: 10px 10px 18px 18px;
+            background: linear-gradient(135deg, #ffc8d8, #f28eaa);
+            box-shadow: 0 12px 18px rgba(201, 77, 120, 0.16);
+        }
+
+        .gift-box::before {
+            position: absolute;
+            top: -8px;
+            right: -9px;
+            left: -9px;
+            height: 19px;
+            border: 4px solid #e983a2;
+            border-radius: 9px;
+            background: #ffe6ee;
+            content: "";
+        }
+
+        .gift-ribbon {
+            position: absolute;
+            z-index: 1;
+            top: 31px;
+            left: 62px;
+            width: 22px;
+            height: 91px;
+            border-right: 4px solid #fff4f7;
+            border-left: 4px solid #fff4f7;
+            background: #fff4f7;
+        }
+
+        .gift-bow {
+            position: absolute;
+            z-index: 2;
+            top: 7px;
+            left: 48px;
+            width: 49px;
+            height: 31px;
+            border: 5px solid #e983a2;
+            border-radius: 50% 50% 8px 50%;
+            background: #fff4f7;
+            transform: rotate(-18deg);
+        }
+
+        .gift-bow::after {
+            position: absolute;
+            top: -4px;
+            left: 29px;
+            width: 42px;
+            height: 28px;
+            border: 5px solid #e983a2;
+            border-radius: 50% 50% 50% 8px;
+            background: #fff4f7;
+            content: "";
+            transform: rotate(35deg);
+        }
+
+        .cover-kicker,
+        .section-kicker {
+            margin: 0 0 10px;
+            color: var(--deep-pink);
+            font-size: 0.77rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        .cover-title {
+            margin: 0;
+            color: var(--deep-pink);
+            font-family: "Dancing Script", cursive;
+            font-size: clamp(2.6rem, 8vw, 4.25rem);
+            line-height: 1.08;
+            text-wrap: balance;
+        }
+
+        .cover-prompt {
+            display: inline-flex;
+            min-height: 50px;
+            align-items: center;
+            justify-content: center;
+            margin-top: 25px;
+            border-radius: 999px;
+            padding: 0 25px;
+            color: #fff;
+            background: var(--deep-pink);
+            box-shadow: 0 9px 20px rgba(201, 77, 120, 0.25);
+            font-size: 0.98rem;
+            font-weight: 700;
+        }
+
+        .main-screen {
+            min-height: 100vh;
+            padding: 34px 22px 45px;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 650ms ease, transform 650ms ease;
+        }
+
+        .main-screen.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .page-content {
+            width: min(100%, 1060px);
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin: 0 auto 24px;
+            text-align: center;
+        }
+
+        .page-header .section-kicker {
+            margin-bottom: 5px;
+        }
+
+        .page-title {
+            margin: 0;
+            color: var(--deep-pink);
+            font-family: "Dancing Script", cursive;
+            font-size: clamp(2.3rem, 6vw, 3.5rem);
+            line-height: 1.15;
+        }
+
+        .photo-row {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            align-items: center;
+            justify-items: center;
+            gap: clamp(10px, 3vw, 30px);
+            width: min(100%, 850px);
+            margin: 0 auto;
+        }
+
+        .main-wish {
+            position: relative;
+            width: min(100%, 780px);
+            margin: 27px auto;
+            border: 1px solid rgba(242, 142, 170, 0.38);
+            border-radius: 30px;
+            padding: clamp(25px, 5vw, 42px) clamp(22px, 6vw, 60px);
+            background: rgba(255, 255, 255, 0.88);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .main-wish::before,
+        .main-wish::after {
+            position: absolute;
+            color: var(--pink);
+            content: "♥";
+            font-size: 1.1rem;
+            opacity: 0.72;
+        }
+
+        .main-wish::before {
+            top: 20px;
+            left: 22px;
+            transform: rotate(-16deg);
+        }
+
+        .main-wish::after {
+            right: 22px;
+            bottom: 18px;
+            transform: rotate(13deg);
+        }
+
+        .wish-heading {
+            margin: 0 0 12px;
+            color: var(--deep-pink);
+            font-family: "Dancing Script", cursive;
+            font-size: clamp(2.3rem, 5.2vw, 3.35rem);
+            line-height: 1.1;
+        }
+
+        .main-wish-text {
+            max-width: 690px;
+            margin: 0 auto;
+            font-size: clamp(1rem, 2.2vw, 1.24rem);
+            font-weight: 500;
+            line-height: 1.9;
+            text-wrap: balance;
+        }
+
+        .photo-card {
+            position: relative;
+            width: min(100%, 220px);
+            border: 0;
+            border-radius: 4px;
+            padding: 9px 9px 13px;
+            background: #fff;
+            box-shadow: 0 10px 25px rgba(107, 59, 76, 0.14);
+            cursor: pointer;
+            transform: rotate(var(--tilt, 0deg));
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 180ms ease, box-shadow 180ms ease;
+            animation: photo-arrive 650ms both;
+            animation-delay: var(--delay, 0ms);
+        }
+
+        .photo-card:hover {
+            z-index: 1;
+            box-shadow: 0 17px 30px rgba(107, 59, 76, 0.2);
+            transform: translateY(-5px) rotate(0deg);
+        }
+
+        .photo-card:active {
+            transform: scale(0.97) rotate(0deg);
+        }
+
+        .photo-card img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 1 / 0.88;
+            border-radius: 2px;
+            background: var(--soft-pink);
+            object-fit: cover;
+        }
+
+        .photo-caption {
+            display: block;
+            margin-top: 8px;
+            color: var(--muted);
+            font-family: "Dancing Script", cursive;
+            font-size: 1.18rem;
+            font-weight: 700;
+        }
+
+        .heart-badge {
+            position: absolute;
+            top: -10px;
+            right: -9px;
+            display: grid;
+            width: 34px;
+            height: 34px;
+            place-items: center;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            color: #fff;
+            background: var(--deep-pink);
+            box-shadow: 0 4px 12px rgba(201, 77, 120, 0.25);
+            font-size: 1rem;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: opacity 180ms ease, transform 180ms ease;
+        }
+
+        .photo-card.is-viewed .heart-badge {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .counter {
+            margin: 25px 0 0;
+            color: var(--muted);
+            font-size: 0.94rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .closing-note {
+            margin: 18px 0 0;
+            color: var(--deep-pink);
+            text-align: center;
+            animation: closing-arrive 700ms both;
+        }
+
+        .closing-note strong {
+            display: block;
+            font-family: "Dancing Script", cursive;
+            font-size: clamp(2.25rem, 6vw, 3.5rem);
+            line-height: 1.2;
+        }
+
+        .closing-note span {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .wish-modal {
+            position: fixed;
+            z-index: 10;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(70, 38, 51, 0.45);
+            opacity: 0;
+            transition: opacity 220ms ease;
+        }
+
+        .wish-modal[hidden] {
+            display: none;
+        }
+
+        .wish-modal.is-open {
+            opacity: 1;
+        }
+
+        .modal-card {
+            position: relative;
+            width: min(100%, 520px);
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            border: 1px solid rgba(242, 142, 170, 0.42);
+            border-radius: 24px;
+            padding: 18px 18px 27px;
+            background: var(--cream-white);
+            box-shadow: 0 25px 80px rgba(48, 23, 33, 0.25);
+            text-align: center;
+            transform: translateY(12px) scale(0.98);
+            transition: transform 220ms ease;
+        }
+
+        .wish-modal.is-open .modal-card {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            z-index: 1;
+            top: 10px;
+            right: 10px;
+            display: grid;
+            width: 46px;
+            height: 46px;
+            place-items: center;
+            border: 1px solid rgba(201, 77, 120, 0.22);
+            border-radius: 50%;
+            color: var(--deep-pink);
+            background: rgba(255, 250, 247, 0.94);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .modal-image {
+            display: block;
+            width: 100%;
+            max-height: min(52vh, 430px);
+            border-radius: 15px;
+            background: var(--soft-pink);
+            object-fit: contain;
+        }
+
+        .modal-kicker {
+            margin: 19px 0 7px;
+            color: var(--deep-pink);
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+        }
+
+        .modal-wish {
+            margin: 0;
+            font-size: clamp(1.02rem, 3vw, 1.2rem);
+            font-weight: 600;
+            line-height: 1.8;
+            text-wrap: balance;
+        }
+
+        .petal {
+            position: fixed;
+            z-index: 8;
+            top: -35px;
+            color: var(--pink);
+            font-size: 23px;
+            opacity: 0.8;
+            pointer-events: none;
+            animation: petal-fall linear forwards;
+        }
+
+        @keyframes gift-bob {
+            0%, 100% { transform: translateY(0) rotate(-1deg); }
+            50% { transform: translateY(-8px) rotate(1deg); }
+        }
+
+        @keyframes photo-arrive {
+            from {
+                opacity: 0;
+                transform: translateY(18px) rotate(calc(var(--tilt, 0deg) - 6deg));
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) rotate(var(--tilt, 0deg));
+            }
+        }
+
+        @keyframes closing-arrive {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes petal-fall {
+            to { transform: translate3d(var(--drift), 110vh, 0) rotate(400deg); }
+        }
+
+        @media (max-width: 620px) {
+            .main-screen {
+                padding: 26px 15px 34px;
+            }
+
+            .page-header {
+                margin-bottom: 20px;
+            }
+
+            .photo-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                column-gap: 13px;
+                row-gap: 16px;
+            }
+
+            .photo-card {
+                width: min(100%, 180px);
+                padding: 7px 7px 10px;
+            }
+
+            .photo-row .photo-card:nth-child(3):last-child {
+                grid-column: 1 / -1;
+                width: min(48%, 180px);
+            }
+
+            .main-wish {
+                margin: 23px auto;
+                border-radius: 24px;
+            }
+
+            .wish-modal {
+                padding: 12px;
+            }
+
+            .modal-card {
+                max-height: calc(100vh - 24px);
+                padding: 12px 12px 22px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+
+            .photo-card {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="cover-screen" id="cover-screen" aria-labelledby="cover-title">
+        <button class="cover-button" id="open-card" type="button" aria-label="Chạm để mở thiệp sinh nhật">
+            <span class="gift-art" aria-hidden="true">
+                <span class="gift-bow"></span>
+                <span class="gift-box"></span>
+                <span class="gift-ribbon"></span>
+            </span>
+            <p class="cover-kicker">Một món quà nhỏ dành tặng</p>
+            <h1 class="cover-title" id="cover-title"></h1>
+            <span class="cover-prompt">Chạm để mở</span>
+        </button>
+    </section>
+
+    <main class="main-screen hidden" id="main-screen" aria-hidden="true">
+        <div class="page-content">
+            <header class="page-header">
+                <p class="section-kicker">Gửi người đặc biệt nhất</p>
+                <h1 class="page-title" id="page-title"></h1>
+            </header>
+
+            <section class="photo-row" id="top-photos" aria-label="Những tấm ảnh kỷ niệm"></section>
+
+            <section class="main-wish" aria-labelledby="wish-heading">
+                <h2 class="wish-heading" id="wish-heading">Chúc mừng sinh nhật!</h2>
+                <p class="main-wish-text" id="main-wish"></p>
+            </section>
+
+            <section class="photo-row" id="bottom-photos" aria-label="Thêm những lời chúc nhỏ"></section>
+            <p class="counter" id="view-counter" aria-live="polite"></p>
+            <p class="closing-note hidden" id="closing-note" aria-live="polite">
+                <strong id="closing-line"></strong>
+            </p>
+        </div>
+    </main>
+
+    <div class="wish-modal" id="wish-modal" role="dialog" aria-modal="true" aria-labelledby="modal-heading" hidden>
+        <div class="modal-card">
+            <button class="modal-close" id="close-modal" type="button" aria-label="Đóng lời chúc">Đóng</button>
+            <img class="modal-image" id="modal-image" alt="">
+            <p class="modal-kicker" id="modal-heading">Lời chúc nhỏ dành cho bạn</p>
+            <p class="modal-wish" id="modal-wish"></p>
+        </div>
+    </div>
+
+    <script>
+        const CARD_CONFIG = {
+            recipientName: "Lan Anh",
+            mainWish: "Chúc mừng sinh nhật nha em bé! Tuổi mới xinh hơn, giàu hơn, vui hơn và nhớ là drama thì cứ để người khác lo nhé.",
+            photos: [
+                {
+                    // Thay src bằng đường dẫn ảnh thật của bạn, ví dụ: "img/anh-1.jpg".
+                    src: "img/582548880_1162608506055581_2387523947691091283_n.jpg",
+                    wish: "Chúc bạn tuổi mới xinh xỉu, slay mọi ngày, nhìn đâu cũng thấy vibe nữ chính."
+                },
+                {
+                    src: "img/583655477_1162608516055580_6766143290946734698_n.jpg",
+                    wish: "Mong số dư tài khoản tăng nhanh hơn tốc độ chạy deadline của bạn."
+                },
+                {
+                    src: "img/615231983_1207279588255139_4171577481607663048_n.jpg",
+                    wish: "Chúc bạn luôn được ăn ngon, ngủ đủ, chill nhẹ nhàng, healing đều đều."
+                },
+                {
+                    src: "img/615822380_1207280304921734_3531333149867971235_n.jpg",
+                    wish: "Crush thì rep tin nhắn trong 1 nốt nhạc, còn người không đáng thì tự biến mất nha."
+                },
+                {
+                    src: "img/616595815_1217258770590554_8795769868202649450_n.jpg",
+                    wish: "Chúc bạn tự tin flex mọi thành tích, vì bạn xứng đáng với tất cả những điều tốt đẹp nhất."
+                },
+                {
+                    src: "img/628051073_1223468629969568_6449542999485091503_n.jpg",
+                    wish: "Cảm ơn vì đã là bestie đỉnh của chóp. Tuổi mới tụi mình quẩy tiếp nha!"
+                }
+            ]
+        };
+
+        const cover = document.getElementById("cover-screen");
+        const openCardButton = document.getElementById("open-card");
+        const mainScreen = document.getElementById("main-screen");
+        const topPhotos = document.getElementById("top-photos");
+        const bottomPhotos = document.getElementById("bottom-photos");
+        const viewCounter = document.getElementById("view-counter");
+        const closingNote = document.getElementById("closing-note");
+        const modal = document.getElementById("wish-modal");
+        const closeModalButton = document.getElementById("close-modal");
+        const modalImage = document.getElementById("modal-image");
+        const modalWish = document.getElementById("modal-wish");
+        const viewedPhotos = new Set();
+        let activePhotoButton = null;
+        let petalsStarted = false;
+
+        document.getElementById("cover-title").textContent = `Chúc mừng sinh nhật ${CARD_CONFIG.recipientName}`;
+        document.getElementById("page-title").textContent = `Dành riêng cho ${CARD_CONFIG.recipientName}`;
+        document.getElementById("main-wish").textContent = CARD_CONFIG.mainWish;
+        document.getElementById("closing-line").textContent = `Thương gửi ♥`;
+
+        function updateCounter() {
+            viewCounter.textContent = `Đã xem ${viewedPhotos.size}/${CARD_CONFIG.photos.length} lời chúc`;
+            if (viewedPhotos.size === CARD_CONFIG.photos.length && !petalsStarted) {
+                petalsStarted = true;
+                closingNote.classList.remove("hidden");
+                releasePetals();
+            }
+        }
+
+        function createPhotoCard(photo, index) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "photo-card";
+            button.setAttribute("aria-label", `Mở lời chúc ${index + 1}`);
+            button.style.setProperty("--tilt", `${(Math.random() * 8 - 4).toFixed(1)}deg`);
+            button.style.setProperty("--delay", `${index * 110}ms`);
+
+            const image = document.createElement("img");
+            image.src = photo.src;
+            image.alt = `Ảnh kỷ niệm ${index + 1}`;
+            image.loading = "lazy";
+
+            const caption = document.createElement("span");
+            caption.className = "photo-caption";
+            caption.textContent = `Kỷ niệm ${String(index + 1).padStart(2, "0")}`;
+
+            const badge = document.createElement("span");
+            badge.className = "heart-badge";
+            badge.setAttribute("aria-hidden", "true");
+            badge.textContent = "♥";
+
+            button.append(image, caption, badge);
+            button.addEventListener("click", () => openWish(photo, index, button));
+            return button;
+        }
+
+        CARD_CONFIG.photos.forEach((photo, index) => {
+            const card = createPhotoCard(photo, index);
+            (index < 3 ? topPhotos : bottomPhotos).append(card);
+        });
+        updateCounter();
+
+        function openCard() {
+            cover.classList.add("is-leaving");
+            mainScreen.classList.remove("hidden");
+            mainScreen.setAttribute("aria-hidden", "false");
+            requestAnimationFrame(() => mainScreen.classList.add("is-visible"));
+            window.setTimeout(() => cover.classList.add("hidden"), 650);
+        }
+
+        function openWish(photo, index, button) {
+            activePhotoButton = button;
+            button.classList.add("is-viewed");
+            viewedPhotos.add(index);
+            updateCounter();
+
+            modalImage.src = photo.src;
+            modalImage.alt = `Ảnh kỷ niệm ${index + 1}`;
+            modalWish.textContent = photo.wish;
+            modal.hidden = false;
+            requestAnimationFrame(() => modal.classList.add("is-open"));
+            closeModalButton.focus();
+        }
+
+        function closeWish() {
+            if (modal.hidden) return;
+            modal.classList.remove("is-open");
+            window.setTimeout(() => {
+                modal.hidden = true;
+                if (activePhotoButton) activePhotoButton.focus();
+            }, 220);
+        }
+
+        function releasePetals() {
+            if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+            for (let index = 0; index < 32; index += 1) {
+                window.setTimeout(() => {
+                    const petal = document.createElement("span");
+                    const duration = 4 + Math.random() * 3;
+                    petal.className = "petal";
+                    petal.setAttribute("aria-hidden", "true");
+                    petal.textContent = Math.random() > 0.45 ? "✿" : "♥";
+                    petal.style.left = `${Math.random() * 100}vw`;
+                    petal.style.setProperty("--drift", `${Math.random() * 140 - 70}px`);
+                    petal.style.animationDuration = `${duration}s`;
+                    document.body.append(petal);
+                    window.setTimeout(() => petal.remove(), duration * 1000);
+                }, index * 120);
+            }
+        }
+
+        openCardButton.addEventListener("click", openCard);
+        closeModalButton.addEventListener("click", closeWish);
+        modal.addEventListener("click", event => {
+            if (event.target === modal) closeWish();
+        });
+        document.addEventListener("keydown", event => {
+            if (event.key === "Escape") closeWish();
+        });
+    </script>
+</body>
+</html>

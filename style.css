@@ -1,0 +1,89 @@
+/* Giao diện tổng thể */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #fff5f7; /* Trắng hồng nhẹ */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Trang hộp quà */
+#gift-page {
+    text-align: center;
+    cursor: pointer;
+    z-index: 100;
+}
+
+.gift-img {
+    width: 200px;
+    animation: bounce 2s infinite;
+}
+
+#gift-page h1 {
+    color: #ff8da1;
+    font-size: 1.5rem;
+    margin-top: 15px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Trang lời chúc */
+#wish-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.wish-content {
+    background: white;
+    padding: 40px;
+    border-radius: 30px;
+    box-shadow: 0 15px 35px rgba(255, 182, 193, 0.4);
+    text-align: center;
+    z-index: 10;
+    border: 2px solid #ffb6c1;
+}
+
+.wish-content h2 {
+    color: #ff1493;
+    font-size: 2rem;
+}
+
+.mewmew-img {
+    width: 120px;
+    margin-top: 20px;
+}
+
+/* Hiệu ứng ảnh rơi */
+.falling-img {
+    position: absolute;
+    top: -100px;
+    z-index: 1;
+    pointer-events: none;
+    animation: fall linear forwards;
+}
+
+/* Các Animation */
+@keyframes fall {
+    to {
+        transform: translateY(110vh) rotate(360deg);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+    40% {transform: translateY(-30px);}
+    60% {transform: translateY(-15px);}
+}
+
+.hidden {
+    display: none !important;
+}
